@@ -6,7 +6,7 @@
         <path
           :d="arcPath"
           fill="none"
-          stroke="#1a1a1a"
+          stroke="#0f172b"
           stroke-width="10"
           filter="drop-shadow(0 0 3px #0f0f0f)"
         />

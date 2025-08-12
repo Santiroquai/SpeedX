@@ -34,7 +34,7 @@
       
       <!-- Botón de acción -->
       <button 
-        class="px-6 py-3 mb-8 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-full font-bold text-white text-md shadow-lg transition-all duration-200 transform hover:scale-102 animate-[custom-bounce_1.4s_infinite]" 
+        class="px-6 py-3 mb-14 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-full font-bold text-white text-md shadow-lg transition-all duration-200 transform hover:scale-102 animate-[custom-bounce_1.4s_infinite]" 
         style="--bounce-height: -8%;"
         @click="startTest" 
         :disabled="isTesting"
