@@ -85,11 +85,11 @@
 
     <!-- Speed Display -->
     <div class="text-center -mt-29">
-      <div class="text-4xl font-bold text-white font-inter tracking-wide">
+      <div class="text-4xl text-white font-digital font-extralight tracking-wide">
         {{ displaySpeed || 0 }}
-        <span class="text-blue-300 text-sm font-semibold">Mbps</span>
       </div>
-      <div v-if="showLabel" class="text-sm text-blue-400 uppercase tracking-wider font-medium mt-8">
+      <span class="text-blue-300 text-sm font-semibold font-inter">Mbps</span>
+      <div v-if="showLabel" class="text-sm text-blue-400 uppercase tracking-wider font-medium mt-8 font-inter">
         {{ label }}
       </div>
     </div>
@@ -177,5 +177,31 @@ function numberY(i) {
 <style scoped>
 .font-inter {
   font-family: 'Inter', sans-serif;
+}
+
+.font-digital {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+/* Para el efecto digital más marcado (opcional) */
+.digital-effect {
+  position: relative;
+}
+.digital-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(59, 130, 246, 0.1) 50%,
+    transparent 100%
+  );
+  opacity: 0.6;
 }
 </style>
