@@ -3,6 +3,7 @@
     <!-- Dial SVG -->
     <div class="relative w-80 h-80 overflow-visible">
       <svg width="100%" height="100%" viewBox="-20 -20 360 360">
+        <!-- Background Arc -->
         <path
           :d="arcPath"
           fill="none"
@@ -10,6 +11,8 @@
           stroke-width="10"
           filter="drop-shadow(0 0 3px #0f0f0f)"
         />
+        
+        <!-- Progress Arc -->
         <path
           :d="arcPath"
           fill="none"
@@ -20,6 +23,8 @@
           :stroke-dashoffset="dashOffset"
           filter="drop-shadow(0 0 6px rgba(59,130,246,0.5))"
         />
+        
+        <!-- Needle -->
         <line
           :x1="center"
           :y1="center"
@@ -28,6 +33,8 @@
           stroke="url(#needleGradient)"
           stroke-width="6"
         />
+        
+        <!-- Marks -->
         <g stroke="#111" stroke-width="1.2">
           <line
             v-for="i in markCount"
@@ -38,6 +45,8 @@
             :y2="calcMarkY(i, true)"
           />
         </g>
+        
+        <!-- Labels -->
         <g
           fill="#e5e5e5"
           font-family="'Inter', sans-serif"
@@ -55,6 +64,7 @@
             {{ value }}
           </text>
         </g>
+        
         <defs>
           <linearGradient
             id="needleGradient"
@@ -73,7 +83,7 @@
       </svg>
     </div>
 
-    <!-- Texto debajo del dial -->
+    <!-- Speed Display -->
     <div class="text-center -mt-29">
       <div class="text-4xl font-bold text-white font-inter tracking-wide">
         {{ displaySpeed || 0 }}
@@ -97,76 +107,71 @@ const props = defineProps({
   showLabel: { type: Boolean, default: false }
 })
 
-const displaySpeed = computed(() => Math.floor(props.speed))
-
+// Configuración geométrica
 const size = 320
 const center = size / 2
 const radius = 140
 const angleOffset = Math.PI * 0.75
 const totalAngle = Math.PI * 1.5
 const markCount = 14
+const tickValues = [0, 5, 10, 50, 100, 150, 300, 500]
+
+// Cálculos reactivos
+const displaySpeed = computed(() => Math.floor(props.speed))
 
 const polar = (angle, r = radius) => ({
   x: center + r * Math.cos(angle),
   y: center + r * Math.sin(angle)
 })
 
-const tickValues = [0, 5, 10, 50, 100, 150, 300, 500]
+const needleAngle = computed(() => {
+  const ratio = getInterpolatedRatio(props.speed)
+  return angleOffset + totalAngle * ratio
+})
 
+const needleX = computed(() => polar(needleAngle.value).x)
+const needleY = computed(() => polar(needleAngle.value).y)
+
+const arcPath = computed(() => {
+  const start = polar(angleOffset)
+  const end = polar(angleOffset + totalAngle)
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 1 1 ${end.x} ${end.y}`
+})
+
+const semicircleLength = computed(() => 2 * Math.PI * radius * (totalAngle / (2 * Math.PI)))
+const dashArray = semicircleLength
+const dashOffset = computed(() => semicircleLength.value * (1 - getInterpolatedRatio(props.speed)))
+
+// Funciones de utilidad
 function getInterpolatedRatio(speed) {
-  const ticks = tickValues
-  for (let i = 0; i < ticks.length - 1; i++) {
-    const start = ticks[i]
-    const end = ticks[i + 1]
-    if (speed >= start && speed <= end) {
-      const localRatio = (speed - start) / (end - start)
-      const globalRatio = (i + localRatio) / (ticks.length - 1)
-      return globalRatio
+  for (let i = 0; i < tickValues.length - 1; i++) {
+    if (speed >= tickValues[i] && speed <= tickValues[i + 1]) {
+      const localRatio = (speed - tickValues[i]) / (tickValues[i + 1] - tickValues[i])
+      return (i + localRatio) / (tickValues.length - 1)
     }
   }
   return 1
 }
 
-const needleAngle = computed(() => {
-  const ratio = getInterpolatedRatio(props.speed)
+function calcAngle(ratio) {
   return angleOffset + totalAngle * ratio
-})
-const needleX = computed(() => polar(needleAngle.value).x)
-const needleY = computed(() => polar(needleAngle.value).y)
-
-const calcAngle = (ratio) => angleOffset + totalAngle * ratio
-
-const calcMarkX = (i, outer = false) => {
-  const angle = calcAngle(i / markCount)
-  const r = outer ? radius + 5 : radius - 5
-  return polar(angle, r).x
 }
 
-const calcMarkY = (i, outer = false) => {
-  const angle = calcAngle(i / markCount)
-  const r = outer ? radius + 5 : radius - 5
-  return polar(angle, r).y
+function calcMarkX(i, outer = false) {
+  return polar(calcAngle(i / markCount), outer ? radius + 5 : radius - 5).x
 }
 
-const numberX = (i) => {
-  const angle = angleOffset + (totalAngle * (i / (tickValues.length - 1)))
-  return polar(angle, radius - 20).x
-}
-const numberY = (i) => {
-  const angle = angleOffset + (totalAngle * (i / (tickValues.length - 1)))
-  return polar(angle, radius - 20).y + 2
+function calcMarkY(i, outer = false) {
+  return polar(calcAngle(i / markCount), outer ? radius + 5 : radius - 5).y
 }
 
-const arcStart = polar(angleOffset)
-const arcEnd = polar(angleOffset + totalAngle)
-const arcPath = `M ${arcStart.x} ${arcStart.y} A ${radius} ${radius} 0 1 1 ${arcEnd.x} ${arcEnd.y}`
+function numberX(i) {
+  return polar(angleOffset + (totalAngle * (i / (tickValues.length - 1))), radius - 20).x
+}
 
-const semicircleLength = 2 * Math.PI * radius * (totalAngle / (2 * Math.PI))
-const dashArray = semicircleLength
-const dashOffset = computed(() => {
-  const ratio = getInterpolatedRatio(props.speed)
-  return semicircleLength * (1 - ratio)
-})
+function numberY(i) {
+  return polar(angleOffset + (totalAngle * (i / (tickValues.length - 1))), radius - 20).y + 2
+}
 </script>
 
 <style scoped>
