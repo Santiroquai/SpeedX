@@ -94,7 +94,7 @@ const props = defineProps({
   maxSpeed: { type: Number, default: 500 },
   label: { type: String, default: '' },
   isUpload: { type: Boolean, default: false },
-  showLabel: { type: Boolean, default: false } // Nueva prop
+  showLabel: { type: Boolean, default: false }
 })
 
 const displaySpeed = computed(() => Math.floor(props.speed))

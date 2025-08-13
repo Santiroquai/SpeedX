@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen w-full font-inter flex flex-col items-center py-26 px-4 text-white bg-gradient-to-br from-[#1f1f43] via-[#21213c] to-[#1a458a]">
+  <div class="min-h-screen w-full font-inter flex flex-col items-center py-22 px-4 text-white bg-gradient-to-br from-[#1f1f43] via-[#21213c] to-[#1a458a]">
     <!-- Fondo animado -->
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
       <div class="w-[120vw] h-[120vw] bg-gradient-radial from-blue-700/30 via-purple-700/20 to-transparent rounded-full blur-3xl opacity-60 animate-[pulse-slow_6s_ease-in-out_infinite] absolute -top-1/3 -left-1/4"></div>
@@ -38,14 +38,14 @@
           </div>
         </div>
         
-        <!-- Botón (solo en estado inicial) -->
+        <!-- Botón (aparece al inicio y después de completar las pruebas) -->
         <button 
-          v-if="!isTesting && downloadSpeed === null"
+          v-if="(!isTesting && downloadSpeed === null) || (downloadSpeed !== null && uploadSpeed !== null && !isTesting)"
           class="px-6 py-3 mb-14 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 rounded-full font-bold text-white text-md shadow-lg transition-all duration-200 transform hover:scale-102 animate-[custom-bounce_1.4s_infinite]"
           @click="startTest"
         >
           <span class="inline-flex items-center gap-3">
-            {{ isTesting ? 'Midiendo...' : 'Iniciar prueba' }}
+            {{ isTesting ? 'Midiendo...' : (downloadSpeed === null ? 'Iniciar prueba' : 'Nueva prueba') }}
           </span>
         </button>
       </div>
@@ -55,7 +55,6 @@
         v-if="isTesting || downloadSpeed !== null"
         class="w-full max-w-md lg:max-w-sm space-y-4 lg:absolute lg:right-[10%] lg:top-1/2 lg:transform lg:-translate-y-1/2 results-enter"
       >
-
         <!-- Sección derecha (resultados) -->
         <div class="w-full max-w-md lg:max-w-xs space-y-4">
           <!-- Mensaje de error -->
@@ -68,7 +67,7 @@
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center space-x-3">
                 <div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                <span class="text-gray-300 font-medium">DESCARGA</span>
+                <span class="text-gray-300 text-sm font-medium">DESCARGA</span>
               </div>
               <span class="text-2xl font-bold text-green-400">
                 {{ downloadSpeed.toFixed(2) }} <span class="text-sm text-green-300/80">Mbps</span>
@@ -87,7 +86,7 @@
             <div class="flex items-center justify-between mb-2">
               <div class="flex items-center space-x-3">
                 <div class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
-                <span class="text-gray-300 font-medium">SUBIDA</span>
+                <span class="text-gray-300 text-sm font-medium">SUBIDA</span>
                 <span class="text-xs text-gray-400/80 bg-gray-800/50 px-2 py-0.5 rounded-full">simulada</span>
               </div>
               <span class="text-2xl font-bold text-purple-400">
@@ -105,14 +104,16 @@
           <!-- Datos del ISP -->
           <div v-if="ispData && downloadSpeed" class="bg-white/5 backdrop-blur-sm rounded-xl p-4 mt-4">
             <div class="grid grid-cols-3 gap-2 text-xs">
-              <div class="text-gray-400">Proveedor:</div>
+              
+              <div class="text-gray-400">- Proveedor:</div>
               <div class="col-span-2 truncate">{{ ispData.isp || 'No detectado' }}</div>
               
-              <div class="text-gray-400">IP:</div>
+              <div class="text-gray-400">- IP:</div>
               <div class="col-span-2 font-mono">{{ ispData.ip }}</div>
               
-              <div class="text-gray-400">Ubicación:</div>
+              <div class="text-gray-400">- Ubicación:</div>
               <div class="col-span-2">{{ ispData.city || 'Local' }}</div>
+
             </div>
           </div>
           
